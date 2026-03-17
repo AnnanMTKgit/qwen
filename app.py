@@ -4,6 +4,7 @@ import requests
 import json
 import re
 import time
+from text_to_num import text2num
 # --- CONFIGURATION DU TUNNEL ---
 # Utilisez l'URL ngrok que vous avez validée avec curl
 NGROK_URL = "https://tu-ironfisted-unstrictly.ngrok-free.dev/v1/chat/completions"
@@ -28,16 +29,46 @@ PROMPT_USER = """Analyse l'image de ce chèque et extrais rigoureusement les inf
   "date": "JJ/MM/AAAA",
   "lieu": "VVille d'émission lié au pays d'origine du chèque",
   "beneficiaire": "Nom de la personne ou entreprise bénéficiaire",
-  "verification": true
-  "Signature":"Extrait la ou les signatures présentes sur le chèque. Si aucune signature n'est détectée, indique null."
+  "Signature":"Présence ou absence de signature (Oui/Non)"
 }
 
-Note : 'verification' est True si quand tu converties sans réfléchir l'expression du "montant en lettres" en une valeur entiere et que cette valeur est égale  au montant en chiffres.
-Si une donnée est illisible, écris null."""
+"""
 
 def encode_image(file):
     return base64.b64encode(file.read()).decode('utf-8')
-
+def correct_mont(l): #nouveau
+        f=[]
+        i=0
+        while i<len(l)-1:
+            if (l[i] =='dix' and (l[i+1] in {'neuf','sept','huit'})) or (l[i] =='quatre'and l[i+1]=='vingt'):
+                f.append(l[i]+'-'+l[i+1])
+                i+=2
+            else:
+                f.append(l[i])
+                i+=1
+        if i==len(l)-1:
+            f.append(l[i])
+        return f
+def conforme(montant_en_lettres,montant_en_chiffres):  #nouveau
+    try:
+        d=montant_en_lettres.lower().split()
+        d=[i for i in d if i in [
+        "zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix",
+        "onze", "douze", "treize", "quatorze", "quinze", "seize", "vingt", "trente", "quarante",
+        "cinquante", "soixante", "quatre-vingt", "cent", "mille", "million", "milliard", "millions", "milliards", "cents"
+    ]] 
+        d=correct_mont(d)
+        
+        d=' '.join(d)
+        d=text2num(d,'fr')
+        
+        if d==int(montant_en_chiffres):
+            return True
+        else:
+            return False
+    except:
+            
+            return False
 def clean_json(text):
     """Nettoie la réponse du modèle pour extraire uniquement le bloc JSON."""
     # Supprime les balises <think>...</think> si le modèle réfléchit à voix haute
@@ -95,7 +126,7 @@ if st.button("🔍 Lancer l'Analyse") and uploaded_files:
                 json_str = clean_json(raw_content)
                 data = json.loads(json_str)
                 
-                if data.get("verification") == True:
+                if conforme(data.get("montant_lettres"), data.get("montant_chiffres")) == True:
                     valides.append({"name": file.name, "image": file, "data": data})
                 else:
                     invalides.append({"name": file.name,"image": file, "data": data})
