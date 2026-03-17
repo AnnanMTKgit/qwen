@@ -36,6 +36,14 @@ PROMPT_USER = """Analyse l'image de ce chèque et extrais rigoureusement les inf
 
 def encode_image(file):
     return base64.b64encode(file.read()).decode('utf-8')
+def extraire_nombre_pur(chaine):
+    # \d correspond à n'importe quel chiffre (0-9)
+    # [^\d] signifie "tout ce qui n'est PAS un chiffre"
+    # On remplace tout ce qui n'est pas un chiffre par une chaîne vide ""
+    nombre_nettoye = re.sub(r'[^\d]', '', chaine)
+    
+    # On convertit en entier si la chaîne n'est pas vide
+    return int(nombre_nettoye) if nombre_nettoye else 0
 def correct_mont(l): #nouveau
         f=[]
         i=0
@@ -62,13 +70,14 @@ def conforme(montant_en_lettres,montant_en_chiffres):  #nouveau
         d=' '.join(d)
         d=text2num(d,'fr')
         
-        if d==int(montant_en_chiffres):
+        if d==extraire_nombre_pur(montant_en_chiffres):
             return True
         else:
             return False
     except:
             
             return False
+
 def clean_json(text):
     """Nettoie la réponse du modèle pour extraire uniquement le bloc JSON."""
     # Supprime les balises <think>...</think> si le modèle réfléchit à voix haute
