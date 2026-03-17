@@ -3,7 +3,7 @@ import base64
 import requests
 import json
 import re
-
+import time
 # --- CONFIGURATION DU TUNNEL ---
 # Utilisez l'URL ngrok que vous avez validée avec curl
 NGROK_URL = "https://tu-ironfisted-unstrictly.ngrok-free.dev/v1/chat/completions"
@@ -23,15 +23,16 @@ PROMPT_USER = """Analyse l'image de ce chèque et extrais rigoureusement les inf
 
 ### FORMAT DE SORTIE (JSON UNIQUEMENT) :
 {
-  "montant_chiffres": 0.0,
+  "montant_chiffres": "Valeur numérique du montant",
   "montant_lettres": "Texte exact écrit",
   "date": "JJ/MM/AAAA",
-  "lieu": "Ville d'émission",
-  "beneficiaire": "Nom du bénéficiaire",
+  "lieu": "VVille d'émission lié au pays d'origine du chèque",
+  "beneficiaire": "Nom de la personne ou entreprise bénéficiaire",
   "verification": true
+  "Signature":"Extrait la ou les signatures présentes sur le chèque. Si aucune signature n'est détectée, indique null."
 }
 
-Note : 'verification' est True si 'montant_chiffres' est strictement égal au 'montant_lettres' converti en chiffres sans l'unité de la monnaie. 
+Note : 'verification' est True si quand tu converties sans réfléchir l'expression du "montant en lettres" en une valeur entiere et que cette valeur est égale  au montant en chiffres.
 Si une donnée est illisible, écris null."""
 
 def encode_image(file):
@@ -53,15 +54,22 @@ st.sidebar.header("⚙️ Configuration Serveur")
 server_url = st.sidebar.text_input("URL ngrok API", value=NGROK_URL)
 model_name = st.sidebar.text_input("Nom du modèle (LM Studio)", value="qwen/qwen3.5-9b")
 
+# --- MESSAGE D'AVERTISSEMENT ---
+st.warning(f"⚠️ **Note importante :** Le traitement utilise les ressources locales de votre serveur. Pour garantir la stabilité du système et éviter tout plantage, merci de ne pas dépasser ** 10 chèques** pour le moment.")
 st.markdown("### 📤 Téléchargement des scans")
 uploaded_files = st.file_uploader("Glissez vos images de chèques ici", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True)
 
 if st.button("🔍 Lancer l'Analyse") and uploaded_files:
     valides = []
     invalides = []
-    
+    total_files = len(uploaded_files)
+    progress_bar = st.progress(0)
+    status_text = st.empty() # Espace vide pour le texte dynamique
     with st.spinner("Traitement en cours sur votre Mac distant..."):
-        for file in uploaded_files:
+        for i, file in enumerate(uploaded_files):
+            percent_complete = int((i / total_files) * 100)
+            progress_bar.progress(percent_complete)
+            status_text.info(f"⏳ Traitement de l'image {i+1}/{total_files} : **{file.name}**")
             try:
                 base64_img = encode_image(file)
                 
@@ -94,7 +102,13 @@ if st.button("🔍 Lancer l'Analyse") and uploaded_files:
                     
             except Exception as e:
                 st.error(f"Erreur sur le fichier {file.name} : {str(e)}")
-
+        
+            # Fin du traitement
+        progress_bar.progress(100)
+        status_text.success(f"✅ Analyse terminée ! {total_files} images traitées.")
+        time.sleep(1) # Petit délai pour laisser l'utilisateur voir le 100%
+        status_text.empty() # On nettoie la barre
+        progress_bar.empty()
     # --- AFFICHAGE DES RÉSULTATS ---
     st.divider()
     col_ok, col_ko = st.columns(2)
