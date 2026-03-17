@@ -46,7 +46,7 @@ def clean_json(text):
     return text
 
 # --- INTERFACE STREAMLIT ---
-st.set_page_config(page_title="Boutique Ba - OCR Chèques", layout="wide", page_icon="🏦")
+st.set_page_config(page_title="Oclear- OCR Chèques", layout="wide", page_icon="🏦")
 
 st.title("🏦 Système de Vérification de Chèques - Obertys")
 st.sidebar.header("⚙️ Configuration Serveur")
