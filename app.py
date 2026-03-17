@@ -31,7 +31,7 @@ PROMPT_USER = """Analyse l'image de ce chèque et extrais rigoureusement les inf
   "verification": true
 }
 
-Note : 'verification' est True si 'montant_chiffres' est strictement égal au 'montant_lettres' converti. 
+Note : 'verification' est True si 'montant_chiffres' est strictement égal au 'montant_lettres' converti en chiffres sans l'unité de la monnaie. 
 Si une donnée est illisible, écris null."""
 
 def encode_image(file):
@@ -90,7 +90,7 @@ if st.button("🔍 Lancer l'Analyse") and uploaded_files:
                 if data.get("verification") == True:
                     valides.append({"name": file.name, "image": file, "data": data})
                 else:
-                    invalides.append({"name": file.name, "data": data})
+                    invalides.append({"name": file.name,"image": file, "data": data})
                     
             except Exception as e:
                 st.error(f"Erreur sur le fichier {file.name} : {str(e)}")
@@ -103,13 +103,14 @@ if st.button("🔍 Lancer l'Analyse") and uploaded_files:
         st.success(f"✅ Chèques Conformes ({len(valides)})")
         for item in valides:
             with st.expander(f"Détails : {item['name']}"):
-                st.image(item['image'], use_container_width=True)
+                st.image(item['image'], use_column_width=True)
                 st.json(item['data'])
 
     with col_ko:
         st.error(f"❌ Erreurs ou Non-conformités ({len(invalides)})")
         for item in invalides:
             st.warning(f"Fichier : {item['name']}")
+            st.image(item['image'], use_column_width=True)
             st.json(item['data'])
 
 st.sidebar.markdown("---")
