@@ -59,17 +59,23 @@ def correct_mont(l): #nouveau
         return f
 def conforme(montant_en_lettres,montant_en_chiffres):  #nouveau
     try:
-        d=montant_en_lettres.lower().split()
+        st.write(montant_en_lettres)
+        
+        texte = montant_en_lettres.lower().replace("-", " ").replace(",", " ")
+    
+        # 3. Découpage en mots
+        d = texte.split()
         d=[i for i in d if i in [
         "zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix",
         "onze", "douze", "treize", "quatorze", "quinze", "seize", "vingt", "trente", "quarante",
-        "cinquante", "soixante", "quatre-vingt", "cent", "mille", "million", "milliard", "millions", "milliards", "cents"
+        "cinquante", "soixante", "cent", "mille", "million", "milliard", "millions", "milliards", "cents"
     ]] 
         d=correct_mont(d)
         
         d=' '.join(d)
-        d=text2num(d,'fr')
         
+        d=text2num(d,'fr')
+        st.write(d)
         if d==extraire_nombre_pur(montant_en_chiffres):
             return True
         else:
