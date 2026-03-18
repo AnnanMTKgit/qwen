@@ -59,7 +59,7 @@ def correct_mont(l): #nouveau
         return f
 def conforme(montant_en_lettres,montant_en_chiffres):  #nouveau
     try:
-        st.write(montant_en_lettres)
+        #st.write(montant_en_lettres)
         
         texte = montant_en_lettres.lower().replace("-", " ").replace(",", " ")
     
@@ -75,7 +75,7 @@ def conforme(montant_en_lettres,montant_en_chiffres):  #nouveau
         d=' '.join(d)
         
         d=text2num(d,'fr')
-        st.write(d)
+        #st.write(d)
         if d==extraire_nombre_pur(montant_en_chiffres):
             return True
         else:
