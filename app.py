@@ -40,10 +40,24 @@ def extraire_nombre_pur(chaine):
     # \d correspond à n'importe quel chiffre (0-9)
     # [^\d] signifie "tout ce qui n'est PAS un chiffre"
     # On remplace tout ce qui n'est pas un chiffre par une chaîne vide ""
-    nombre_nettoye = re.sub(r'[^\d]', '', chaine)
+    nombre_nettoye = re.sub(r'[^0-9.,]', '', chaine)
     
-    # On convertit en entier si la chaîne n'est pas vide
-    return int(nombre_nettoye) if nombre_nettoye else 0
+    if '.' in nombre_nettoye and ',' in nombre_nettoye:
+        # On supprime le point des milliers et on remplace la virgule par un point
+        nombre_nettoye = nombre_nettoye.replace('.', '').replace(',', '.')
+    
+    # 3. Cas "561,479" ou "240421,20" (Virgule seule)
+    elif ',' in nombre_nettoye:
+        nombre_nettoye = nombre_nettoye.replace(',', '.')
+    elif '.' in nombre_nettoye:
+        nombre_nettoye = nombre_nettoye.replace('.', '')
+    # 4. Cas "240 421.00" (Espace comme séparateur de milliers)
+    elif ' ' in nombre_nettoye:
+        nombre_nettoye = nombre_nettoye.replace(' ', '') 
+    
+    return float(nombre_nettoye)
+    
+        
 def correct_mont(l): #nouveau
         f=[]
         i=0
@@ -59,23 +73,25 @@ def correct_mont(l): #nouveau
         return f
 def conforme(montant_en_lettres,montant_en_chiffres):  #nouveau
     try:
-        #st.write(montant_en_lettres)
+       
         
-        texte = montant_en_lettres.lower().replace("-", " ").replace(",", " ")
-    
+        texte = re.sub(r'[\*\#]', '', montant_en_lettres)
+        
         # 3. Découpage en mots
-        d = texte.split()
+        d = texte.lower().split(" ")
+        
         d=[i for i in d if i in [
         "zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix",
-        "onze", "douze", "treize", "quatorze", "quinze", "seize", "vingt", "trente", "quarante",
+        "onze", "douze", "treize" , "quatorze", "quinze", "seize", "vingt", "trente", "quarante",
         "cinquante", "soixante", "cent", "mille", "million", "milliard", "millions", "milliards", "cents"
-    ]] 
+    ]  ]
+        
         d=correct_mont(d)
         
         d=' '.join(d)
-        
+       
         d=text2num(d,'fr')
-        #st.write(d)
+        
         if d==extraire_nombre_pur(montant_en_chiffres):
             return True
         else:
