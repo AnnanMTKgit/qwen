@@ -73,13 +73,11 @@ def correct_mont(l): #nouveau
         return f
 def conforme(montant_en_lettres,montant_en_chiffres):  #nouveau
     try:
-       
-        
         texte = re.sub(r'[\*\#]', '', montant_en_lettres)
         
         # 3. Découpage en mots
-        d = texte.lower().split(" ")
-        
+        d = texte.lower().replace("-", " ").split(" ")
+      
         d=[i for i in d if i in [
         "zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix",
         "onze", "douze", "treize" , "quatorze", "quinze", "seize", "vingt", "trente", "quarante",
@@ -91,13 +89,13 @@ def conforme(montant_en_lettres,montant_en_chiffres):  #nouveau
         d=' '.join(d)
        
         d=text2num(d,'fr')
-        
+       
         if d==extraire_nombre_pur(montant_en_chiffres):
             return True
         else:
             return False
-    except:
-            
+    except Exception as e:
+            print(f"Erreur lors de la vérification de la conformité des montants : {str(e)}")
             return False
 
 def clean_json(text):
