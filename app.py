@@ -133,7 +133,7 @@ if st.button("🔍 Lancer l'Analyse") and uploaded_files:
                 base64_img = encode_image(file)
                 
                 payload = {
-                    "model": model_name,
+                    "model": st.secrets["MODEL_NAME"],
                     "messages": [
                         {"role": "system", "content": PROMPT_SYSTEM},
                         {
@@ -147,7 +147,7 @@ if st.button("🔍 Lancer l'Analyse") and uploaded_files:
                     "temperature": 0
                 }
 
-                response = requests.post(server_url, json=payload, headers=HEADERS, timeout=120)
+                response = requests.post(st.secrets["NGROK_URL"], json=payload, headers=HEADERS, timeout=120)
                 response.raise_for_status()
                 
                 raw_content = response.json()['choices'][0]['message']['content']
