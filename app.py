@@ -185,6 +185,3 @@ if st.button("🔍 Lancer l'Analyse") and uploaded_files:
         for item in invalides:
             st.write(f"**{item['name']}** : {item['error']}")
     
-
-st.sidebar.markdown("---")
-st.sidebar.caption("Oclear | 2026")
