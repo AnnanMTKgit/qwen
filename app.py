@@ -155,15 +155,15 @@ if st.button("🔍 Lancer l'Analyse") and uploaded_files:
                 
                 raw_content = response.json()['choices'][0]['message']['content']
                 json_str = clean_json(raw_content)
-                data = json.loads(json_str)
                 
-                if conforme(data.get("montant_lettres"), data.get("montant_chiffres")) == True:
-                    valides.append({"name": file.name, "image": file, "data": data})
-                else:
-                    invalides.append({"name": file.name,"image": file, "data": data})
+                data = json.loads(json_str)
+                data['Conformité des montants'] = conforme(data.get("montant_lettres"), data.get("montant_chiffres"))
+                
+                valides.append({"name": file.name,"image": file, "data": data})
                     
             except Exception as e:
                 st.error(f"Erreur sur le fichier {file.name} : {str(e)}")
+                invalides.append({"name": file.name, "error": str(e)})
         
             # Fin du traitement
         progress_bar.progress(100)
@@ -173,21 +173,21 @@ if st.button("🔍 Lancer l'Analyse") and uploaded_files:
         progress_bar.empty()
     # --- AFFICHAGE DES RÉSULTATS ---
     st.divider()
-    col_ok, col_ko = st.columns(2)
+    col_ok, col_ko = st.columns([70,30])
 
+    
+    
     with col_ok:
-        st.success(f"✅ Chèques Conformes ({len(valides)})")
+        st.success(f"✅ Chèques lus ({len(valides)})")
         for item in valides:
             with st.expander(f"Détails : {item['name']}"):
-                st.image(item['image'], use_column_width=True)
+                st.image(item['image'], width="content")
                 st.json(item['data'])
-
     with col_ko:
-        st.error(f"❌ Erreurs ou Non-conformités ({len(invalides)})")
+        st.error(f"❌ Erreurs rencontrées ({len(invalides)})")
         for item in invalides:
-            st.warning(f"Fichier : {item['name']}")
-            st.image(item['image'], use_column_width=True)
-            st.json(item['data'])
+            st.write(f"**{item['name']}** : {item['error']}")
+    
 
 st.sidebar.markdown("---")
 st.sidebar.caption("Oclear | 2026")
