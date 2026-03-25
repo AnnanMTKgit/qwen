@@ -7,8 +7,8 @@ import time
 from text_to_num import text2num
 # --- CONFIGURATION DU TUNNEL ---
 # Utilisez l'URL ngrok que vous avez validée avec curl
-NGROK_URL = "https://tu-ironfisted-unstrictly.ngrok-free.dev/v1/chat/completions"
 
+NGROK_URL = st.secrets["NGROK_URL"]
 # Headers pour bypasser l'avertissement ngrok et définir le format JSON
 HEADERS = {
     "ngrok-skip-browser-warning": "69420",
@@ -112,9 +112,6 @@ def clean_json(text):
 st.set_page_config(page_title="Oclear- OCR Chèques", layout="wide", page_icon="🏦")
 
 st.title("🏦 Système de Vérification de Chèques - Obertys")
-st.sidebar.header("⚙️ Configuration Serveur")
-server_url = st.sidebar.text_input("URL ngrok API", value=NGROK_URL)
-model_name = st.sidebar.text_input("Nom du modèle (LM Studio)", value="qwen/qwen3.5-9b")
 
 # --- MESSAGE D'AVERTISSEMENT ---
 st.warning(f"⚠️ **Note importante :** Le traitement utilise les ressources locales de votre serveur. Pour garantir la stabilité du système et éviter tout plantage, merci de ne pas dépasser ** 10 chèques** pour le moment.")
