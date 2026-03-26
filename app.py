@@ -47,12 +47,13 @@ def extraire_nombre_pur(chaine):
         nombre_nettoye = nombre_nettoye.replace('.', '').replace(',', '.')
     
     # 3. Cas "561,479" ou "240421,20" (Virgule seule)
-    elif ',' in nombre_nettoye:
+    if ',' in nombre_nettoye:
+
         nombre_nettoye = nombre_nettoye.replace(',', '.')
-    elif '.' in nombre_nettoye:
+    if '.' in nombre_nettoye:
         nombre_nettoye = nombre_nettoye.replace('.', '')
     # 4. Cas "240 421.00" (Espace comme séparateur de milliers)
-    elif ' ' in nombre_nettoye:
+    if ' ' in nombre_nettoye:
         nombre_nettoye = nombre_nettoye.replace(' ', '') 
     
     return float(nombre_nettoye)
@@ -89,7 +90,8 @@ def conforme(montant_en_lettres,montant_en_chiffres):  #nouveau
         d=' '.join(d)
        
         d=text2num(d,'fr')
-       
+        
+        
         if d==extraire_nombre_pur(montant_en_chiffres):
             return True
         else:
