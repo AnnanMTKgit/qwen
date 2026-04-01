@@ -28,7 +28,7 @@ PROMPT_USER = """Analyse l'image de ce chèque et extrais rigoureusement les inf
   "montant_lettres": "Texte exact écrit",
   "date": "JJ/MM/AAAA",
   "lieu": "VVille d'émission lié au pays d'origine du chèque",
-  "beneficiaire": "Nom de la personne ou entreprise bénéficiaire",
+  "beneficiaire": "Nom de la personne ou entreprise bénéficiaire (l'expression suivant  le mot 'à l'ordre de' ou 'payez à l'ordre de' est un indice fort pour identifier le bénéficiaire)",
   "Signature":"Présence ou absence de signature (Oui/Non)"
 }
 
